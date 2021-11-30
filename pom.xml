@@ -7,6 +7,7 @@
         <module>base</module>
         <module>domain</module>
         <module>common</module>
+        <module>demo</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

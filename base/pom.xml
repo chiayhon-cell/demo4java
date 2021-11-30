@@ -24,10 +24,16 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-  <!--  引入base模块  -->
+  <!--  引入domain模块  -->
     <dependency>
       <groupId>cn.chiayhon</groupId>
       <artifactId>domain</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  <!--  引入common模块  -->
+    <dependency>
+      <groupId>cn.chiayhon</groupId>
+      <artifactId>common</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
