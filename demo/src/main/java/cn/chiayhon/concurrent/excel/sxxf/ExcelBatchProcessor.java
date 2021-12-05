@@ -58,14 +58,14 @@ public class ExcelBatchProcessor<E> {
 
     public void execute() {
         ExecutorService executorService = Executors.newFixedThreadPool(lines.size());
-        CountDownLatch proccessorLatch = new CountDownLatch(lines.size());
+        CountDownLatch processorLatch = new CountDownLatch(lines.size());
         for (BatchLine<E> line : lines) {
             executorService.submit(
-                    () -> line.startBatch(proccessorLatch)
+                    () -> line.startBatch(processorLatch)
             );
         }
         try {
-            proccessorLatch.await();
+            processorLatch.await();
             System.err.println("批处理器结束");
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -92,7 +92,7 @@ public class ExcelBatchProcessor<E> {
 }
 
 @Slf4j
-class ExcelWriteTask<E> extends ExcelTask<E> implements ModelSupplier<ExcelModel> {
+class ExcelWriteTask<E> extends ExcelTask<E> implements Callable<SXSSFWorkbook>, ModelSupplier<ExcelModel> {
 
     private ModelSupplier<ExcelModel> modelSupplier;
 
@@ -101,14 +101,14 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements ModelSupplier<ExcelModel
     }
 
     @Override
-    public List<E> call() throws Exception {
+    public SXSSFWorkbook call() throws Exception {
 
         ExcelModel excelModel = getModel();
 
         // 从数据对象中获取列值使用的getter方法名集合
         List<ExcelColumnModel> cols = excelModel.getColumns();
         List<String> methodNames = new ArrayList<>();
-        String sheetName = excelModel.getName();
+        String filename = excelModel.getName();
         String propertyName;
         for (ExcelColumnModel column : cols) {
             propertyName = "get" + BigDataExcelUtils.upperCaseHead(column.getPropertyName());
@@ -117,7 +117,7 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements ModelSupplier<ExcelModel
 
         // 创建sheet
         SXSSFWorkbook workbook = new SXSSFWorkbook(100);
-        SXSSFSheet sxssfSheet = BigDataExcelUtils.createSheet(workbook, excelModel.getColumns(), sheetName + "" + Math.round(1000));
+        SXSSFSheet sxssfSheet = BigDataExcelUtils.createSheet(workbook, excelModel.getColumns(), filename + "" + Math.round(1000));
 
         // 创建输出流
         try (OutputStream outputStream = new FileOutputStream("D:/" + excelModel.getName())) {
@@ -133,7 +133,6 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements ModelSupplier<ExcelModel
             } while (!getTaskQueue().isEmpty() || latch.getCount() > 1);
             latch.countDown();
             // FIXME: 2021/12/5 只有一条数据时无法导出
-            // 输出
             workbook.write(outputStream);
         } catch (Exception e) {
             log.error("导出失败", e);
@@ -170,7 +169,7 @@ interface DataSupplier<E> {
 
 @Data
 @Slf4j
-class ExcelDbTask<E> extends ExcelTask<E> implements DataSupplier<E> {
+class ExcelDbTask<E> extends ExcelTask<E> implements Callable<List<E>>, DataSupplier<E> {
     /**
      * 批次编号:默认为1
      */
@@ -239,15 +238,15 @@ class BatchLine<E> {
      */
     private static final int LATCH_SIZE = 2;
 
-    private ExcelTask<E> readTask;
+    private ExcelDbTask<E> readTask;
 
-    private ExcelTask<E> writeTask;
+    private ExcelWriteTask<E> writeTask;
 
     private ThreadPoolExecutor executor;
 
     private CountDownLatch lineLatch;
 
-    public BatchLine(ExcelTask<E> readTask, ExcelTask<E> writeTask, ThreadPoolExecutor executor) {
+    public BatchLine(ExcelDbTask<E> readTask, ExcelWriteTask<E> writeTask, ThreadPoolExecutor executor) {
         this.readTask = readTask;
         this.writeTask = writeTask;
         this.executor = executor;
@@ -260,7 +259,7 @@ class BatchLine<E> {
      * @param writeTask 数据写任务
      * @return
      */
-    public static <E> BatchLine<E> init(ExcelTask<E> readTask, ExcelTask<E> writeTask, ThreadPoolExecutor executor) {
+    public static <E> BatchLine<E> init(ExcelDbTask<E> readTask, ExcelWriteTask<E> writeTask, ThreadPoolExecutor executor) {
         BatchLine<E> line = new BatchLine<>(readTask, writeTask, executor);
         // 设置任务队列
         BlockingQueue<List<E>> es = new ArrayBlockingQueue<>(QUEUE_SIZE);
@@ -274,12 +273,12 @@ class BatchLine<E> {
         return line;
     }
 
-    public void startBatch(CountDownLatch proccessorLatch) {
+    public void startBatch(CountDownLatch processorLatch) {
         executor.submit(readTask);
         executor.submit(writeTask);
         try {
             this.lineLatch.await();
-            proccessorLatch.countDown();
+            processorLatch.countDown();
             System.err.println("流水线结束");
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -288,7 +287,7 @@ class BatchLine<E> {
 
 }
 
-abstract class ExcelTask<E> implements Callable<List<E>> {
+abstract class ExcelTask<E> {
     /**
      * 任务队列
      */
