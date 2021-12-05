@@ -41,19 +41,22 @@ public class ExcelBatchProcessor<E> {
         int totalSize = config.getTotalSize();
         int limitSize = config.getLimitSize();
         int batchSize = config.getBatchSize();
+        String sheetName = config.getSheetName();
         int lineSize = (totalSize + limitSize - 1) / limitSize;
         // 创建批次流水线
         List<BatchLine<E>> list = new ArrayList<>();
-        for (int i = 0; i < lineSize; i++, totalSize -= limitSize) {
-            // 数据读任务，设置数据库查询任务次数
+        for (int i = 1; i <= lineSize; i++, totalSize -= limitSize) {
+            // 数据读任务，设置查询条件、数据总数、每批次处理数
             PageCondition newCondition = new PageCondition();
             BeanUtils.copyProperties(condition, newCondition);
             ExcelDbTask<E> readTask = new ExcelDbTask<>(newCondition, dataSupplier);
             int dataSize = Math.min(totalSize, limitSize);
-            readTask.setBatchSize(batchSize);
             readTask.setDataSize(dataSize);
-            // 数据写任务
+            readTask.setBatchSize(batchSize);
+            // 数据写任务，设置表单名
             ExcelWriteTask<E> writeTask = new ExcelWriteTask<>(modelSupplier);
+            writeTask.setSheetName(sheetName + "-" + i);
+
             BatchLine<E> batchLine = BatchLine.init(readTask, writeTask, executor);
             list.add(batchLine);
         }
@@ -95,6 +98,8 @@ public class ExcelBatchProcessor<E> {
 @Data
 class ExcelWriteTask<E> extends ExcelTask<E> implements Runnable, ModelSupplier<ExcelModel> {
 
+    private String sheetName;
+
     private ModelSupplier<ExcelModel> modelSupplier;
 
     private SXSSFWorkbook workbook;
@@ -110,14 +115,6 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements Runnable, ModelSupplier<
             model = modelSupplier.getModel();
         }
         return model;
-    }
-
-    public ModelSupplier<ExcelModel> getModelSupplier() {
-        return modelSupplier;
-    }
-
-    public void setModelSupplier(ModelSupplier<ExcelModel> modelSupplier) {
-        this.modelSupplier = modelSupplier;
     }
 
     @Override
@@ -137,7 +134,7 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements Runnable, ModelSupplier<
         // 创建sheet
         SXSSFSheet sxssfSheet;
         synchronized (ExcelBatchProcessor.lock) {
-            sxssfSheet = BigDataExcelUtils.createSheet(workbook, excelModel.getColumns(), filename + "" + Math.random() * 1000);
+            sxssfSheet = BigDataExcelUtils.createSheet(workbook, excelModel.getColumns(), sheetName);
         }
         CountDownLatch latch = getLatch();
         List<E> data;
@@ -310,6 +307,7 @@ abstract class ExcelTask<E> {
     }
 }
 
+@Data
 class ExcelBatchConfig {
 
     /**
@@ -325,35 +323,16 @@ class ExcelBatchConfig {
      * 线程每批次处理数量
      */
     private int batchSize;
+    /**
+     * 表单名
+     */
+    private String sheetName;
 
 
-    public ExcelBatchConfig(int totalSize, int limitSize, int batchSize) {
+    public ExcelBatchConfig(int totalSize, int limitSize, int batchSize, String sheetName) {
         this.totalSize = totalSize;
         this.limitSize = limitSize;
         this.batchSize = batchSize;
-    }
-
-    public int getTotalSize() {
-        return totalSize;
-    }
-
-    public void setTotalSize(int totalSize) {
-        this.totalSize = totalSize;
-    }
-
-    public int getLimitSize() {
-        return limitSize;
-    }
-
-    public void setLimitSize(int limitSize) {
-        this.limitSize = limitSize;
-    }
-
-    public int getBatchSize() {
-        return batchSize;
-    }
-
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
+        this.sheetName = sheetName;
     }
 }

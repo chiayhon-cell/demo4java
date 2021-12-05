@@ -37,7 +37,7 @@ public class MyTest implements ApplicationRunner {
             }
             return data;
         };
-        String fileName = "TestPoi" + (int) (Math.random() * 1000) + ".xlsx";
+        String fileName = "TestPoi.xlsx";
         ModelSupplier<ExcelModel> modelSupplier = () -> {
             // 映射
             int width = 10 * 512 + 500;
@@ -51,7 +51,7 @@ public class MyTest implements ApplicationRunner {
             excelModel.setColumns(columnModels);
             return excelModel;
         };
-        ExcelBatchConfig config = new ExcelBatchConfig(5000, 1000, 100);
+        ExcelBatchConfig config = new ExcelBatchConfig(500000, 100000, 1000,"表单");
         try (OutputStream outputStream = new FileOutputStream("D:/" + fileName)) {
             processor.init(
                     config,
