@@ -32,7 +32,7 @@ public class ExcelBatchProcessor<E> {
     @Resource(name = "excelBatchThreadPool")
     private ThreadPoolExecutor executor;
 
-    public void init(ExcelBatchConfig config, PageCondition condition, DataSupplier<E> supplier) {
+    public void init(ExcelBatchConfig config, PageCondition condition, DataSupplier<E> dataSupplier,ModelSupplier<ExcelModel> modelSupplier) {
         int totalSize = config.getTotalSize();
         int limitSize = config.getLimitSize();
         int batchSize = config.getBatchSize();
@@ -43,12 +43,12 @@ public class ExcelBatchProcessor<E> {
             // 数据读任务，设置数据库查询任务次数
             PageCondition newCondition = new PageCondition();
             BeanUtils.copyProperties(condition, newCondition);
-            ExcelDbTask<E> readTask = new ExcelDbTask<>(newCondition, supplier);
+            ExcelDbTask<E> readTask = new ExcelDbTask<>(newCondition, dataSupplier);
             int dataSize = Math.min(totalSize, limitSize);
             readTask.setBatchSize(batchSize);
             readTask.setDataSize(dataSize);
             // 数据写任务
-            ExcelWriteTask<E> writeTask = new ExcelWriteTask<>();
+            ExcelWriteTask<E> writeTask = new ExcelWriteTask<>(modelSupplier);
             BatchLine<E> batchLine = BatchLine.init(readTask, writeTask, executor);
             list.add(batchLine);
         }
@@ -81,21 +81,18 @@ public class ExcelBatchProcessor<E> {
 }
 
 @Slf4j
-class ExcelWriteTask<E> extends ExcelTask<E> {
+class ExcelWriteTask<E> extends ExcelTask<E> implements ModelSupplier<ExcelModel> {
+
+    private ModelSupplier<ExcelModel> modelSupplier;
+
+    public ExcelWriteTask(ModelSupplier<ExcelModel> modelSupplier) {
+        this.modelSupplier = modelSupplier;
+    }
 
     @Override
     public List<E> call() throws Exception {
 
-        // 映射
-        int width = 10 * 512 + 500;
-        ExcelModel excelModel = new ExcelModel();
-        excelModel.setName("TestPoi" + (int) (Math.random() * 1000) + ".xlsx");
-        List<ExcelColumnModel> columnModels = new ArrayList<>();
-        columnModels.add(new ExcelColumnModel("vin", "vin", width));
-        columnModels.add(new ExcelColumnModel("设备ID", "firmwareId", width));
-        columnModels.add(new ExcelColumnModel("升级状态", "updateStatus", width));
-        columnModels.add(new ExcelColumnModel("失败原因", "failReason", width));
-        excelModel.setColumns(columnModels);
+        ExcelModel excelModel = getModel();
 
         // 从数据对象中获取列值使用的getter方法名集合
         List<ExcelColumnModel> cols = excelModel.getColumns();
@@ -135,6 +132,23 @@ class ExcelWriteTask<E> extends ExcelTask<E> {
             workbook.close();
         }
         return null;
+    }
+
+    @Override
+    public ExcelModel getModel() {
+        ExcelModel model = null;
+        if (!Objects.isNull(modelSupplier)) {
+            model = modelSupplier.getModel();
+        }
+        return model;
+    }
+
+    public ModelSupplier<ExcelModel> getModelSupplier() {
+        return modelSupplier;
+    }
+
+    public void setModelSupplier(ModelSupplier<ExcelModel> modelSupplier) {
+        this.modelSupplier = modelSupplier;
     }
 }
 
