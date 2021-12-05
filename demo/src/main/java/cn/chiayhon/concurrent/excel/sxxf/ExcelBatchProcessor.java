@@ -32,7 +32,7 @@ public class ExcelBatchProcessor<E> {
     @Resource(name = "excelBatchThreadPool")
     private ThreadPoolExecutor executor;
 
-    public void init(ExcelBatchConfig config, PageCondition condition, DataSupplier<E> dataSupplier,ModelSupplier<ExcelModel> modelSupplier) {
+    public void init(ExcelBatchConfig config, PageCondition condition, DataSupplier<E> dataSupplier, ModelSupplier<ExcelModel> modelSupplier) {
         int totalSize = config.getTotalSize();
         int limitSize = config.getLimitSize();
         int batchSize = config.getBatchSize();
@@ -57,9 +57,20 @@ public class ExcelBatchProcessor<E> {
     }
 
     public void execute() {
+        ExecutorService executorService = Executors.newFixedThreadPool(lines.size());
+        CountDownLatch proccessorLatch = new CountDownLatch(lines.size());
         for (BatchLine<E> line : lines) {
-            line.start();
+            executorService.submit(
+                    () -> line.startBatch(proccessorLatch)
+            );
         }
+        try {
+            proccessorLatch.await();
+            System.err.println("批处理器结束");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        executorService.shutdown();
     }
 
 
@@ -119,7 +130,7 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements ModelSupplier<ExcelModel
                 data.clear();
                 log.info("任务消费完成!");
                 // 当还有任务或者dbTask未完成时,writeTask不能停止
-            } while (!getTaskQueue().isEmpty() || latch.getCount() > 0);
+            } while (!getTaskQueue().isEmpty() || latch.getCount() > 1);
             latch.countDown();
             // FIXME: 2021/12/5 只有一条数据时无法导出
             // 输出
@@ -224,15 +235,17 @@ class BatchLine<E> {
      */
     private static final int QUEUE_SIZE = 2;
     /**
-     * 倒计时锁，与读任务相关联
+     * 倒计时，与读任务相关联
      */
-    private static final int LATCH_SIZE = 1;
+    private static final int LATCH_SIZE = 2;
 
     private ExcelTask<E> readTask;
 
     private ExcelTask<E> writeTask;
 
     private ThreadPoolExecutor executor;
+
+    private CountDownLatch lineLatch;
 
     public BatchLine(ExcelTask<E> readTask, ExcelTask<E> writeTask, ThreadPoolExecutor executor) {
         this.readTask = readTask;
@@ -249,19 +262,28 @@ class BatchLine<E> {
      */
     public static <E> BatchLine<E> init(ExcelTask<E> readTask, ExcelTask<E> writeTask, ThreadPoolExecutor executor) {
         BatchLine<E> line = new BatchLine<>(readTask, writeTask, executor);
-        // 设置任务队列和倒计时锁
+        // 设置任务队列
         BlockingQueue<List<E>> es = new ArrayBlockingQueue<>(QUEUE_SIZE);
         readTask.setTaskQueue(es);
         writeTask.setTaskQueue(es);
+
         CountDownLatch latch = new CountDownLatch(LATCH_SIZE);
+        line.setLineLatch(latch);
         readTask.setLatch(latch);
         writeTask.setLatch(latch);
         return line;
     }
 
-    public void start() {
+    public void startBatch(CountDownLatch proccessorLatch) {
         executor.submit(readTask);
         executor.submit(writeTask);
+        try {
+            this.lineLatch.await();
+            proccessorLatch.countDown();
+            System.err.println("流水线结束");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

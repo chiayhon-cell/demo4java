@@ -49,7 +49,7 @@ public class MyTest implements ApplicationRunner {
             excelModel.setColumns(columnModels);
             return excelModel;
         };
-        ExcelBatchConfig config = new ExcelBatchConfig(500000, 100000, 1000);
+        ExcelBatchConfig config = new ExcelBatchConfig(5000, 1000, 100);
         processor.init(
                 config,
                 new PageCondition(),
