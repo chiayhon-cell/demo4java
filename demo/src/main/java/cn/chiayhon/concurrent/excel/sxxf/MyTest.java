@@ -10,6 +10,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +37,12 @@ public class MyTest implements ApplicationRunner {
             }
             return data;
         };
-
-        ModelSupplier<ExcelModel> modelSupplier = () ->{
+        String fileName = "TestPoi" + (int) (Math.random() * 1000) + ".xlsx";
+        ModelSupplier<ExcelModel> modelSupplier = () -> {
             // 映射
             int width = 10 * 512 + 500;
             ExcelModel excelModel = new ExcelModel();
-            excelModel.setName("TestPoi" + (int) (Math.random() * 1000) + ".xlsx");
+            excelModel.setName(fileName);
             List<ExcelColumnModel> columnModels = new ArrayList<>();
             columnModels.add(new ExcelColumnModel("vin", "vin", width));
             columnModels.add(new ExcelColumnModel("设备ID", "firmwareId", width));
@@ -50,14 +52,17 @@ public class MyTest implements ApplicationRunner {
             return excelModel;
         };
         ExcelBatchConfig config = new ExcelBatchConfig(5000, 1000, 100);
-        processor.init(
-                config,
-                new PageCondition(),
-                dataSupplier,
-                modelSupplier
-                );
-        System.err.println("批处理器开始执行");
-        processor.execute();
-        System.err.println("批处理器执行完毕");
+        try (OutputStream outputStream = new FileOutputStream("D:/" + fileName)) {
+            processor.init(
+                    config,
+                    new PageCondition(),
+                    dataSupplier,
+                    modelSupplier,
+                    outputStream
+            );
+            System.err.println("批处理器开始执行");
+            processor.execute();
+            System.err.println("批处理器执行完毕");
+        }
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,16 +23,21 @@ import java.util.concurrent.*;
  * Excel批次数据执行器
  */
 @Component
+@Data
 public class ExcelBatchProcessor<E> {
+
+    public static final Object lock = new Object();
 
     private ExcelBatchConfig config;
 
     private List<BatchLine<E>> lines;
 
+    private OutputStream outputStream;
+
     @Resource(name = "excelBatchThreadPool")
     private ThreadPoolExecutor executor;
 
-    public void init(ExcelBatchConfig config, PageCondition condition, DataSupplier<E> dataSupplier, ModelSupplier<ExcelModel> modelSupplier) {
+    public void init(ExcelBatchConfig config, PageCondition condition, DataSupplier<E> dataSupplier, ModelSupplier<ExcelModel> modelSupplier, OutputStream outputStream) {
         int totalSize = config.getTotalSize();
         int limitSize = config.getLimitSize();
         int batchSize = config.getBatchSize();
@@ -54,94 +59,48 @@ public class ExcelBatchProcessor<E> {
         }
         this.setConfig(config);
         this.setLines(list);
+        this.setOutputStream(outputStream);
     }
 
     public void execute() {
         ExecutorService executorService = Executors.newFixedThreadPool(lines.size());
         CountDownLatch processorLatch = new CountDownLatch(lines.size());
+        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
         for (BatchLine<E> line : lines) {
             executorService.submit(
-                    () -> line.startBatch(processorLatch)
+                    () -> line.startBatch(processorLatch, workbook)
             );
         }
         try {
             processorLatch.await();
+            workbook.write(outputStream);
             System.err.println("批处理器结束");
         } catch (InterruptedException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            workbook.dispose();
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            executorService.shutdown();
         }
-        executorService.shutdown();
-    }
-
-
-    public ExcelBatchConfig getConfig() {
-        return config;
-    }
-
-    public void setConfig(ExcelBatchConfig config) {
-        this.config = config;
-    }
-
-    public List<BatchLine<E>> getLines() {
-        return lines;
-    }
-
-    public void setLines(List<BatchLine<E>> lines) {
-        this.lines = lines;
     }
 }
 
 @Slf4j
-class ExcelWriteTask<E> extends ExcelTask<E> implements Callable<SXSSFWorkbook>, ModelSupplier<ExcelModel> {
+@Data
+class ExcelWriteTask<E> extends ExcelTask<E> implements Runnable, ModelSupplier<ExcelModel> {
 
     private ModelSupplier<ExcelModel> modelSupplier;
 
+    private SXSSFWorkbook workbook;
+
     public ExcelWriteTask(ModelSupplier<ExcelModel> modelSupplier) {
         this.modelSupplier = modelSupplier;
-    }
-
-    @Override
-    public SXSSFWorkbook call() throws Exception {
-
-        ExcelModel excelModel = getModel();
-
-        // 从数据对象中获取列值使用的getter方法名集合
-        List<ExcelColumnModel> cols = excelModel.getColumns();
-        List<String> methodNames = new ArrayList<>();
-        String filename = excelModel.getName();
-        String propertyName;
-        for (ExcelColumnModel column : cols) {
-            propertyName = "get" + BigDataExcelUtils.upperCaseHead(column.getPropertyName());
-            methodNames.add(propertyName);
-        }
-
-        // 创建sheet
-        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
-        SXSSFSheet sxssfSheet = BigDataExcelUtils.createSheet(workbook, excelModel.getColumns(), filename + "" + Math.round(1000));
-
-        // 创建输出流
-        try (OutputStream outputStream = new FileOutputStream("D:/" + excelModel.getName())) {
-            CountDownLatch latch = getLatch();
-            List<E> data;
-            do {
-                data = getTaskQueue().take();
-                log.info("开始消费任务");
-                BigDataExcelUtils.export2Sheet(sxssfSheet, methodNames, data);
-                data.clear();
-                log.info("任务消费完成!");
-                // 当还有任务或者dbTask未完成时,writeTask不能停止
-            } while (!getTaskQueue().isEmpty() || latch.getCount() > 1);
-            latch.countDown();
-            // FIXME: 2021/12/5 只有一条数据时无法导出
-            workbook.write(outputStream);
-        } catch (Exception e) {
-            log.error("导出失败", e);
-        } finally {
-            // dispose of temporary files backing this workbook on disk
-            workbook.dispose();
-            workbook.close();
-        }
-        return null;
     }
 
     @Override
@@ -159,6 +118,44 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements Callable<SXSSFWorkbook>,
 
     public void setModelSupplier(ModelSupplier<ExcelModel> modelSupplier) {
         this.modelSupplier = modelSupplier;
+    }
+
+    @Override
+    public void run() {
+        ExcelModel excelModel = getModel();
+
+        // 从数据对象中获取列值使用的getter方法名集合
+        List<ExcelColumnModel> cols = excelModel.getColumns();
+        List<String> methodNames = new ArrayList<>();
+        String filename = excelModel.getName();
+        String propertyName;
+        for (ExcelColumnModel column : cols) {
+            propertyName = "get" + BigDataExcelUtils.upperCaseHead(column.getPropertyName());
+            methodNames.add(propertyName);
+        }
+
+        // 创建sheet
+        SXSSFSheet sxssfSheet;
+        synchronized (ExcelBatchProcessor.lock) {
+            sxssfSheet = BigDataExcelUtils.createSheet(workbook, excelModel.getColumns(), filename + "" + Math.random() * 1000);
+        }
+        CountDownLatch latch = getLatch();
+        List<E> data;
+        try {
+            do {
+                data = getTaskQueue().take();
+                log.info("开始消费任务");
+                BigDataExcelUtils.export2Sheet(sxssfSheet, methodNames, data);
+                data.clear();
+                log.info("任务消费完成!");
+                // 当还有任务或者dbTask未完成时,writeTask不能停止
+            } while (!getTaskQueue().isEmpty() || latch.getCount() > 1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Thread.currentThread().interrupt();
+        } finally {
+            latch.countDown();
+        }
     }
 }
 
@@ -273,8 +270,9 @@ class BatchLine<E> {
         return line;
     }
 
-    public void startBatch(CountDownLatch processorLatch) {
+    public void startBatch(CountDownLatch processorLatch, SXSSFWorkbook workbook) {
         executor.submit(readTask);
+        writeTask.setWorkbook(workbook);
         executor.submit(writeTask);
         try {
             this.lineLatch.await();
