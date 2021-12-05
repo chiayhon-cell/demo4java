@@ -27,7 +27,7 @@ public class ExcelColumnModel {
     public ExcelColumnModel(String name, String propertyName, int width) {
         this.name = name;
         this.propertyName = propertyName;
-        this.width = width;
+        this.width = width * 512 + 500;
     }
 
     public String getName() {

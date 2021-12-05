@@ -1,7 +1,6 @@
 package cn.chiayhon.concurrent.excel.sxxf;
 
 import cn.chiayhon.TaskHistory;
-import cn.chiayhon.excel.ExcelColumnModel;
 import cn.chiayhon.excel.ExcelModel;
 import cn.chiayhon.page.PageCondition;
 import lombok.extern.slf4j.Slf4j;
@@ -37,21 +36,22 @@ public class MyTest implements ApplicationRunner {
             }
             return data;
         };
+
         String fileName = "TestPoi.xlsx";
         ModelSupplier<ExcelModel> modelSupplier = () -> {
             // 映射
-            int width = 10 * 512 + 500;
+            int width = 6;
             ExcelModel excelModel = new ExcelModel();
             excelModel.setName(fileName);
-            List<ExcelColumnModel> columnModels = new ArrayList<>();
-            columnModels.add(new ExcelColumnModel("vin", "vin", width));
-            columnModels.add(new ExcelColumnModel("设备ID", "firmwareId", width));
-            columnModels.add(new ExcelColumnModel("升级状态", "updateStatus", width));
-            columnModels.add(new ExcelColumnModel("失败原因", "failReason", width));
-            excelModel.setColumns(columnModels);
+            excelModel.buildColumn()
+                    .addColumn("vin", "vin", width)
+                    .addColumn("设备ID", "firmwareId", width)
+                    .addColumn("升级状态", "updateStatus", width)
+                    .addColumn("失败原因", "failReason", width);
             return excelModel;
         };
-        ExcelBatchConfig config = new ExcelBatchConfig(500000, 100000, 1000,"表单");
+
+        ExcelBatchConfig config = new ExcelBatchConfig(123456, 30000, 1000,"表单");
         try (OutputStream outputStream = new FileOutputStream("D:/" + fileName)) {
             processor.init(
                     config,

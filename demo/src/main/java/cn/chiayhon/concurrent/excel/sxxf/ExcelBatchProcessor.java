@@ -26,6 +26,8 @@ import java.util.concurrent.*;
 @Data
 public class ExcelBatchProcessor<E> {
 
+    public static final int WINDOW_SIZE = 200;
+
     public static final Object lock = new Object();
 
     private ExcelBatchConfig config;
@@ -68,12 +70,14 @@ public class ExcelBatchProcessor<E> {
     public void execute() {
         ExecutorService executorService = Executors.newFixedThreadPool(lines.size());
         CountDownLatch processorLatch = new CountDownLatch(lines.size());
-        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+        SXSSFWorkbook workbook = new SXSSFWorkbook(WINDOW_SIZE);
+
         for (BatchLine<E> line : lines) {
             executorService.submit(
                     () -> line.startBatch(processorLatch, workbook)
             );
         }
+
         try {
             processorLatch.await();
             workbook.write(outputStream);
@@ -104,6 +108,8 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements Runnable, ModelSupplier<
 
     private SXSSFWorkbook workbook;
 
+    private static final String PREFIX_OF_GET_METHOD = "get";
+
     public ExcelWriteTask(ModelSupplier<ExcelModel> modelSupplier) {
         this.modelSupplier = modelSupplier;
     }
@@ -124,10 +130,9 @@ class ExcelWriteTask<E> extends ExcelTask<E> implements Runnable, ModelSupplier<
         // 从数据对象中获取列值使用的getter方法名集合
         List<ExcelColumnModel> cols = excelModel.getColumns();
         List<String> methodNames = new ArrayList<>();
-        String filename = excelModel.getName();
         String propertyName;
         for (ExcelColumnModel column : cols) {
-            propertyName = "get" + BigDataExcelUtils.upperCaseHead(column.getPropertyName());
+            propertyName = PREFIX_OF_GET_METHOD + BigDataExcelUtils.upperCaseHead(column.getPropertyName());
             methodNames.add(propertyName);
         }
 
@@ -191,22 +196,29 @@ class ExcelDbTask<E> extends ExcelTask<E> implements Callable<List<E>>, DataSupp
     }
 
     @Override
-    public List<E> call() throws Exception {
+    public List<E> call() {
         List<E> data = null;
         int batchTimes = (dataSize + batchSize - 1) / batchSize;
-        for (int i = 0; i < batchTimes; i++, dataSize -= batchSize) {
-            Integer integer = batchNo.get();
-            log.info("准备生产任务..");
-            condition.setPageNo(i + 1);
-            condition.setPageSize(Math.min(dataSize, batchSize));
-            data = this.getDataByCondition(condition);
-            getTaskQueue().put(data);
-            log.info("生产任务成功！！！目前批次:{},剩余批次:{}", integer++, batchTimes - i - 1);
-            batchNo.set(integer);
+        try {
+            for (int i = 0; i < batchTimes; i++, dataSize -= batchSize) {
+                Integer integer = batchNo.get();
+                log.info("准备生产任务..");
+                condition.setPageNo(i + 1);
+                condition.setPageSize(Math.min(dataSize, batchSize));
+                data = this.getDataByCondition(condition);
+                getTaskQueue().put(data);
+                log.info("生产任务成功！！！目前批次:{},剩余批次:{}", integer++, batchTimes - i - 1);
+                batchNo.set(integer);
+            }
+        } catch (Exception e) {
+            log.error("读取数据时发生异常",e);
+            Thread.currentThread().interrupt();
+        } finally {
+            // 数据读取完成
+            getLatch().countDown();
+            batchNo.remove();
         }
-        // 数据读取完成
-        getLatch().countDown();
-        batchNo.remove();
+
         return data;
     }
 
@@ -274,9 +286,9 @@ class BatchLine<E> {
         try {
             this.lineLatch.await();
             processorLatch.countDown();
-            System.err.println("流水线结束");
         } catch (InterruptedException e) {
             e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
