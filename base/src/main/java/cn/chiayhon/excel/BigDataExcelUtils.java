@@ -1,4 +1,4 @@
-package cn.chiayhon.poi.excel.sxxsf;
+package cn.chiayhon.excel;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -34,7 +34,6 @@ public class BigDataExcelUtils {
 
 
     public static <T> void export(ExcelBatchProcessor<T> excelBatchProcessor, ExcelModel excelModel, OutputStream outputStream) {
-
 
         SXSSFWorkbook workbook = new SXSSFWorkbook(BUFFER_SIZE);
 
@@ -85,7 +84,7 @@ public class BigDataExcelUtils {
      * @param getters 从数据对象中获取列值使用的getter方法名集合
      * @param data    数据
      */
-    private static void export2Sheet(SXSSFSheet sheet, List<String> getters, List<?> data) {
+    public static void export2Sheet(SXSSFSheet sheet, List<String> getters, List<?> data) {
 
         try {
 
@@ -135,7 +134,7 @@ public class BigDataExcelUtils {
      * @param sheetName 工作表名称
      * @return SXSSFSheet
      */
-    private static SXSSFSheet createSheet(SXSSFWorkbook workbook, List<ExcelColumnModel> cols,
+    public static SXSSFSheet createSheet(SXSSFWorkbook workbook, List<ExcelColumnModel> cols,
                                           String sheetName) {
 
         // 创建一个sheet对象
@@ -170,7 +169,7 @@ public class BigDataExcelUtils {
      * @param word 单词
      * @return String
      */
-    private static String upperCaseHead(String word) {
+    public static String upperCaseHead(String word) {
         char[] chars = word.toCharArray();
         int j = chars[0] - 32;
         chars[0] = (char) j;

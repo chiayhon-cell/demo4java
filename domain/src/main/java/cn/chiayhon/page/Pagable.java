@@ -1,4 +1,4 @@
-package cn.chiayhon.poi.excel.sxxsf;
+package cn.chiayhon.page;
 
 public interface Pagable {
     int getOffset();

@@ -1,6 +1,11 @@
 package cn.chiayhon.poi.excel.sxxsf;
 
-import lombok.Data;
+import cn.chiayhon.TaskHistory;
+import cn.chiayhon.excel.BigDataExcelUtils;
+import cn.chiayhon.excel.ExcelBatchProcessor;
+import cn.chiayhon.excel.ExcelColumnModel;
+import cn.chiayhon.excel.ExcelModel;
+import cn.chiayhon.page.PageCondition;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,7 +16,7 @@ import java.util.List;
 /**
  * 测试excel操作工具类
  */
-public class PoiExcelUtilsTest {
+public class SXXSFExcelUtilsTest {
 
     /**
      * 文件保存目录
@@ -19,7 +24,7 @@ public class PoiExcelUtilsTest {
     private static final String UPLOAD_PATH = "D:/";
 
     public static void main(String[] args) {
-        new PoiExcelUtilsTest().testExport();
+        new SXXSFExcelUtilsTest().testExport();
     }
 
     /**
@@ -69,18 +74,4 @@ public class PoiExcelUtilsTest {
         }
     }
 
-    /**
-     * 封装测试数据
-     */
-    @Data
-    public static class TaskHistory {
-
-        private String vin;
-
-        private String updateStatus;
-
-        private String firmwareId;
-
-        private String failReason;
-    }
 }

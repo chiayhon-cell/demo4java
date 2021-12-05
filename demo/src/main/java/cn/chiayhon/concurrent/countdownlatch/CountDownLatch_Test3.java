@@ -1,4 +1,4 @@
-package cn.chiayhon.concurrent;
+package cn.chiayhon.concurrent.countdownlatch;
 
 import java.util.ArrayList;
 import java.util.List;

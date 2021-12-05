@@ -1,4 +1,4 @@
-package cn.chiayhon.poi.excel.sxxsf;
+package cn.chiayhon.excel;
 
 /**
  * 封装excel导出列信息
