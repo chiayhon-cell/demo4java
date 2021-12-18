@@ -1,4 +1,4 @@
-package cn.chiayhon.concurrent.ThreadPool;
+package cn.chiayhon.concurrent.threadpool;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 
 @Slf4j
-abstract class Class_1 implements Runnable {
+abstract class Class1 implements Runnable {
 
     @Override
     public void run() {
@@ -25,18 +25,18 @@ abstract class Class_1 implements Runnable {
 }
 
 @Slf4j
-class Class_2 extends Class_1 {
+class Class2 extends Class1 {
 
     @Override
     protected void doRun() {
         try {
-            System.out.println("class2开始执行");
+            log.info("class2开始执行");
             for (int i = 0; i < 4; i++) {
                 if (i == 1) {
-                    System.out.println("i=1，执行结束");
+                    log.info("i=1，执行结束");
                     return;
                 }
-                System.out.println(i);
+                log.info("{}", i);
             }
         } finally {
             log.info("class2执行结束");
@@ -46,12 +46,12 @@ class Class_2 extends Class_1 {
 
 
 @Slf4j
-public class ThreadPool_Test1 {
+public class ThreadPoolTest1 {
 
     public static void main(String[] args) throws InterruptedException {
         log.info("子线程开启");
         ExecutorService executorService = Executors.newFixedThreadPool(3);
-        executorService.submit(new Class_2());
+        executorService.submit(new Class2());
     }
 }
 

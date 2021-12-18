@@ -1,16 +1,17 @@
 package cn.chiayhon.design_pattern.observer.demo1;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class WeatherData implements Subject {
-	private ArrayList observers;
+	private final List<Object> observers;
 	private double temperature;
 	private double humidity;
 	private double pressure;
 
 	/*当数据源初始化时，维护一个记录观察者的列表*/
 	public WeatherData() {
-		observers = new ArrayList();
+		observers = new ArrayList<>();
 	}
 
 	/*实现Subject接口的注册方法*/
@@ -29,8 +30,8 @@ public class WeatherData implements Subject {
 
 	/*实现Subject接口的notifyObservers()，用于向所有注册的观察者发送数据*/
 	public void notifyObservers() {
-		for (int i = 0; i < observers.size(); i++) {
-			Observer observer = (Observer) observers.get(i);
+		for (Object o : observers) {
+			Observer observer = (Observer) o;
 			observer.update(temperature, humidity, pressure);
 		}
 	}

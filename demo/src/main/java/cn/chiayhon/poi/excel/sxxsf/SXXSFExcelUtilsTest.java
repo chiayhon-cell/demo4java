@@ -6,7 +6,9 @@ import cn.chiayhon.excel.ExcelBatchProcessor;
 import cn.chiayhon.excel.ExcelColumnModel;
 import cn.chiayhon.excel.ExcelModel;
 import cn.chiayhon.page.PageCondition;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,12 +18,13 @@ import java.util.List;
 /**
  * 测试excel操作工具类
  */
+@Slf4j
 public class SXXSFExcelUtilsTest {
 
     /**
      * 文件保存目录
      */
-    private static final String UPLOAD_PATH = "D:/";
+    private static final String UPLOAD_PATH = "D:" + File.pathSeparator;
 
     public static void main(String[] args) {
         new SXXSFExcelUtilsTest().testExport();
@@ -34,7 +37,7 @@ public class SXXSFExcelUtilsTest {
 
         // 打印一下运行内存
         long maxMemory = Runtime.getRuntime().maxMemory();
-        System.out.println(maxMemory / 1024 / 1024 + "MB");
+        log.info(maxMemory / 1024 / 1024 + "MB");
 
         String filename = "TestPoi1.xlsx";
 
@@ -70,7 +73,7 @@ public class SXXSFExcelUtilsTest {
                     outputStream);
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("", e);
         }
     }
 

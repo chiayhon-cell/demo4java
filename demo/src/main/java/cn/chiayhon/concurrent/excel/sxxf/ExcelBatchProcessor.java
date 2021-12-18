@@ -5,6 +5,8 @@ import cn.chiayhon.excel.ExcelColumnModel;
 import cn.chiayhon.excel.ExcelModel;
 import cn.chiayhon.page.PageCondition;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -24,6 +26,7 @@ import java.util.concurrent.*;
  */
 @Component
 @Data
+@Slf4j
 public class ExcelBatchProcessor<E> {
 
     public static final int WINDOW_SIZE = 200;
@@ -81,8 +84,9 @@ public class ExcelBatchProcessor<E> {
         try {
             processorLatch.await();
             workbook.write(outputStream);
-            System.err.println("批处理器结束");
+            log.info("批处理器结束");
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -98,8 +102,9 @@ public class ExcelBatchProcessor<E> {
     }
 }
 
+@Getter
+@Setter
 @Slf4j
-@Data
 class ExcelWriteTask<E> extends ExcelTask<E> implements Runnable, ModelSupplier<ExcelModel> {
 
     private String sheetName;
@@ -166,8 +171,9 @@ interface DataSupplier<E> {
     List<E> getDataByCondition(PageCondition condition);
 }
 
-@Data
 @Slf4j
+@Getter
+@Setter
 class ExcelDbTask<E> extends ExcelTask<E> implements Callable<List<E>>, DataSupplier<E> {
     /**
      * 批次编号:默认为1
@@ -204,11 +210,10 @@ class ExcelDbTask<E> extends ExcelTask<E> implements Callable<List<E>>, DataSupp
             for (int i = 0; i < batchTimes; i++, dataSize -= batchSize) {
                 Integer integer = batchNo.get();
                 log.info("准备生产任务..");
-                int pageNo = i + 1;
                 int realSize = Math.min(dataSize, batchSize);
                 condition.setPageNo(newPageNo);
                 condition.setPageSize(realSize);
-                System.err.println("newPageNo=" + newPageNo + ",realSize=" + realSize);
+                log.info("newPageNo=" + newPageNo + ",realSize=" + realSize);
                 data = this.getDataByCondition(condition);
                 getTaskQueue().put(data);
                 log.info("生产任务成功！！！目前批次:{},剩余批次:{}", integer++, batchTimes - i - 1);
@@ -267,7 +272,6 @@ class BatchLine<E> {
      *
      * @param readTask  数据读任务
      * @param writeTask 数据写任务
-     * @return
      */
     public static <E> BatchLine<E> init(ExcelDbTask<E> readTask, ExcelWriteTask<E> writeTask, ThreadPoolExecutor executor) {
         BatchLine<E> line = new BatchLine<>(readTask, writeTask, executor);

@@ -1,16 +1,19 @@
 package cn.chiayhon.concurrent.countdownlatch;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class CountDownLatch_Test2 {
+@Slf4j
+public class CountDownLatchTest2 {
 
 
     public static void main(String[] args) throws InterruptedException {
 
-        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(2, 10, 100, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(3));
+        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(2, 10, 100, TimeUnit.SECONDS, new ArrayBlockingQueue<>(3));
 
         int count = 10;
 
@@ -26,7 +29,7 @@ public class CountDownLatch_Test2 {
         // 等待线程池处理任务
         latch.await();
 
-        System.err.println("等待线程被唤醒！");
+        log.info("等待线程被唤醒！");
 
         threadPool.shutdown();
 
@@ -37,7 +40,7 @@ public class CountDownLatch_Test2 {
     static class MyRunnable1 implements Runnable {
 
 
-        CountDownLatch latch = null;
+        CountDownLatch latch;
 
         int i;
 
@@ -55,16 +58,13 @@ public class CountDownLatch_Test2 {
 
         public void run() {
 
-            System.err.println("线程" + i + "完成了操作...");
+            log.info("线程" + i + "完成了操作...");
 
             try {
-
-                Thread.currentThread();
-
                 Thread.sleep(4000);
 
             } catch (InterruptedException e) {
-
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
 
             }

@@ -62,9 +62,9 @@ public class MyTest implements ApplicationRunner {
                     modelSupplier,
                     outputStream
             );
-            System.err.println("批处理器开始执行");
+            log.info("批处理器开始执行");
             processor.execute();
-            System.err.println("批处理器执行完毕");
+            log.info("批处理器执行完毕");
         }
     }
 }

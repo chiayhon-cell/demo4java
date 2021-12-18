@@ -1,9 +1,9 @@
-package cn.chiayhon.concurrent.ThreadPool;
+package cn.chiayhon.concurrent.threadpool;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class class_3 implements Runnable{
+public class Class3 implements Runnable {
 
     @Override
     public void run() {

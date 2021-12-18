@@ -1,5 +1,6 @@
 package cn.chiayhon.excel;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -9,7 +10,6 @@ import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 大数据量Excel导出工具类
  */
+@Slf4j
 public class BigDataExcelUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BigDataExcelUtils.class);
@@ -32,12 +33,13 @@ public class BigDataExcelUtils {
      */
     public static final String DEFAULT_SHEET_NAME = "sheet";
 
+    private BigDataExcelUtils() {
+    }
 
     public static <T> void export(ExcelBatchProcessor<T> excelBatchProcessor, ExcelModel excelModel, OutputStream outputStream) {
 
-        SXSSFWorkbook workbook = new SXSSFWorkbook(BUFFER_SIZE);
 
-        try {
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(BUFFER_SIZE)) {
             // 从数据对象中获取列值使用的getter方法名集合
             List<String> methodNames = new ArrayList<>();
             List<ExcelColumnModel> cols = excelModel.getColumns();
@@ -56,23 +58,16 @@ public class BigDataExcelUtils {
                 SXSSFSheet sxssfSheet = createSheet(workbook, cols, sheetName + i);
                 export2Sheet(sxssfSheet, methodNames, objects);
                 objects.clear();
-                System.out.print("\r" + "Current batch >> " + (i + 1));
+                log.info("\r" + "Current batch >> " + (i + 1));
                 i++;
             }
 
             // 输出
             workbook.write(outputStream);
+            workbook.dispose();
 
         } catch (Exception e) {
             LOGGER.error("导出失败", e);
-        } finally {
-            // dispose of temporary files backing this workbook on disk
-            workbook.dispose();
-            try {
-                workbook.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 

@@ -1,7 +1,7 @@
 package cn.chiayhon.design_pattern.observer.demo2;
 
-public class test {
-    
+public class MyTest {
+
     public static void main(String[] args) {
 
         ConcreteSubject subject = new ConcreteSubject();

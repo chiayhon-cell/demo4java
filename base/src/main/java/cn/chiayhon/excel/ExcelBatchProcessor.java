@@ -1,6 +1,7 @@
 package cn.chiayhon.excel;
 
 import cn.chiayhon.page.PageCondition;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -9,6 +10,7 @@ import java.util.Objects;
 /**
  * 批次数据生成器
  */
+@Slf4j
 public class ExcelBatchProcessor<E> implements DataSupplier<E> {
 
     /**
@@ -50,10 +52,10 @@ public class ExcelBatchProcessor<E> implements DataSupplier<E> {
 
     public static <T> ExcelBatchProcessor<T> init(int totalSize, int batchSize, PageCondition condition,DataSupplier<T> supplier){
         if (totalSize <= 0 || batchSize <= 0){
-            System.out.println("处理数目至少为1");
+            log.info("处理数目至少为1");
         }
         if (Objects.isNull(condition) || Objects.isNull(supplier)){
-            System.out.println("参数不能传空");
+            log.info("参数不能传空");
         }
         return new ExcelBatchProcessor<>(totalSize,batchSize,condition,supplier);
     }

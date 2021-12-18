@@ -6,7 +6,7 @@ import java.util.List;
 public class ConcreteSubject implements Subject {
 
     // 订阅者容器
-    private List<Observer> observers = new ArrayList<Observer>();
+    private List<Observer> observers = new ArrayList<>();
 
     @Override
     public void attach(Observer observer) {

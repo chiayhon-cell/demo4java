@@ -1,4 +1,4 @@
-package cn.chiayhon.concurrent.completeFuture;
+package cn.chiayhon.concurrent.completefuture;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,7 +8,7 @@ import java.util.concurrent.*;
  * completeFuture
  */
 @Slf4j
-public class CompleteFuture_Test1 {
+public class CompleteFutureTest1 {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
@@ -26,9 +26,7 @@ public class CompleteFuture_Test1 {
         });
         cachePool.submit(task);
         log.info("开启异步任务1完成，等待异步任务1执行结果");
-        CompletableFuture<String> completableFuture2 = completableFuture1.whenComplete((s, throwable) -> {
-            log.info("异步任务1回调结果:{}",s);
-        });
+        CompletableFuture<String> completableFuture2 = completableFuture1.whenComplete((s, throwable) -> log.info("异步任务1回调结果:{}", s));
         log.info("异步任务1执行结果:{}", task.get());
         log.info("根据上一次的异步任务结果, 继续开始一个新的异步任务!");
         CompletableFuture<String> completableFuture3 = new CompletableFuture<>();
@@ -40,13 +38,12 @@ public class CompleteFuture_Test1 {
                 completableFuture3.complete("回调2！！！");
                 log.info("异步任务2处理完毕");
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
             return 233333;
         });
-        completableFuture3.whenComplete((i, throwable) -> {
-            log.info("异步任务2回调结果:{}",i);
-        });
+        completableFuture3.whenComplete((i, throwable) -> log.info("异步任务2回调结果:{}", i));
 
         log.info("异步任务2执行结果:{}", completableFuture4.get());
 
