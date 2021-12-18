@@ -13,11 +13,13 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
 public class MyTest implements ApplicationRunner {
 
+    private final AtomicInteger integer = new AtomicInteger(0);
 
     @Autowired
     private ExcelBatchProcessor<TaskHistory> processor;
@@ -28,7 +30,7 @@ public class MyTest implements ApplicationRunner {
             List<TaskHistory> data = new ArrayList<>();
             for (int i = 1, n = condition.getPageSize(); i <= n; i++) {
                 TaskHistory taskHistory = new TaskHistory();
-                taskHistory.setFirmwareId(String.format("11%08d", n));
+                taskHistory.setFirmwareId(String.valueOf(integer.getAndIncrement()));
                 taskHistory.setFailReason("系统异常");
                 taskHistory.setUpdateStatus("请求成功");
                 taskHistory.setVin(String.format("1099728%08d", n));
@@ -51,7 +53,7 @@ public class MyTest implements ApplicationRunner {
             return excelModel;
         };
 
-        ExcelBatchConfig config = new ExcelBatchConfig(123456, 30000, 1000,"表单");
+        ExcelBatchConfig config = new ExcelBatchConfig(2000, 1000, 100,"表单");
         try (OutputStream outputStream = new FileOutputStream("D:/" + fileName)) {
             processor.init(
                     config,

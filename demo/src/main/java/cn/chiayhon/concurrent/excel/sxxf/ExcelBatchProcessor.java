@@ -199,19 +199,23 @@ class ExcelDbTask<E> extends ExcelTask<E> implements Callable<List<E>>, DataSupp
     public List<E> call() {
         List<E> data = null;
         int batchTimes = (dataSize + batchSize - 1) / batchSize;
+        int newPageNo = (condition.getOffset() / batchSize) + 1;
         try {
             for (int i = 0; i < batchTimes; i++, dataSize -= batchSize) {
                 Integer integer = batchNo.get();
                 log.info("准备生产任务..");
-                condition.setPageNo(i + 1);
-                condition.setPageSize(Math.min(dataSize, batchSize));
+                int pageNo = i + 1;
+                int realSize = Math.min(dataSize, batchSize);
+                condition.setPageNo(newPageNo);
+                condition.setPageSize(realSize);
+                System.err.println("newPageNo=" + newPageNo + ",realSize=" + realSize);
                 data = this.getDataByCondition(condition);
                 getTaskQueue().put(data);
                 log.info("生产任务成功！！！目前批次:{},剩余批次:{}", integer++, batchTimes - i - 1);
                 batchNo.set(integer);
             }
         } catch (Exception e) {
-            log.error("读取数据时发生异常",e);
+            log.error("读取数据时发生异常", e);
             Thread.currentThread().interrupt();
         } finally {
             // 数据读取完成
