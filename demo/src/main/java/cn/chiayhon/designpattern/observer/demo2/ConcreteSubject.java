@@ -1,4 +1,4 @@
-package cn.chiayhon.design_pattern.observer.demo2;
+package cn.chiayhon.designpattern.observer.demo2;
 
 import java.util.ArrayList;
 import java.util.List;

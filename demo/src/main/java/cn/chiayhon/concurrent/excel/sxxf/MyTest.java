@@ -10,6 +10,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,10 @@ public class MyTest implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+//        start();
+    }
+
+    private void start() throws IOException {
         DataSupplier<TaskHistory> dataSupplier = condition -> {
             List<TaskHistory> data = new ArrayList<>();
             for (int i = 1, n = condition.getPageSize(); i <= n; i++) {

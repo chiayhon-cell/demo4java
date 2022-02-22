@@ -1,4 +1,4 @@
-package cn.chiayhon.design_pattern.observer.demo1;
+package cn.chiayhon.designpattern.observer.demo1;
 
 public interface Subject {
 	public void registerObserver(Observer o);	//数据源提供用于 （ 观察者想要获取数据源时调用此方法注册）

@@ -1,4 +1,4 @@
-package cn.chiayhon.design_pattern.observer.demo2;
+package cn.chiayhon.designpattern.observer.demo2;
 
 public interface Subject {
     // 添加订阅关系

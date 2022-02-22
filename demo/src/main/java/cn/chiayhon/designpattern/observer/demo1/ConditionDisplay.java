@@ -1,4 +1,4 @@
-package cn.chiayhon.design_pattern.observer.demo1;
+package cn.chiayhon.designpattern.observer.demo1;
 
 import lombok.extern.slf4j.Slf4j;
 
