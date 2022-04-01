@@ -6,18 +6,17 @@ import cn.chiayhon.spring.eventpublisher.event.MessageEvent;
 import cn.chiayhon.spring.eventpublisher.event.RegisterSuccessEvent;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
-public class MessageEventListener implements ApplicationListener<MessageEvent> {
+public class AnnotationBasedMessageEventListener {
 
+    //    @EventListener(MessageEvent.class)
     @SneakyThrows
-    @Override
-    public void onApplicationEvent(MessageEvent event) {
+    public void listen(MessageEvent event) {
         String message;
         final MessageType type = event.getType();
         log.info("成功接受信息事件:" + type.getDesc());
@@ -44,3 +43,4 @@ public class MessageEventListener implements ApplicationListener<MessageEvent> {
         log.info("收到信息：" + message);
     }
 }
+

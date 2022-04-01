@@ -1,7 +1,6 @@
 package cn.chiayhon;
 
 import cn.chiayhon.pojo.User;
-import cn.chiayhon.spring.aop.SpringAopTest;
 import cn.chiayhon.spring.eventpublisher.UserController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -31,7 +30,7 @@ public class DemoApplication {
         log.info("注册结果:" + message);
     }
 
-    private static void springAopTest(ConfigurableApplicationContext context) {
-        final SpringAopTest testBean = context.getBean(SpringAopTest.class);
-    }
+//    private static void springAopTest(ConfigurableApplicationContext context) {
+//        final SpringAopTest testBean = context.getBean(SpringAopTest.class);
+//    }
 }
