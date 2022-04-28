@@ -1,16 +1,21 @@
 package cn.chiayhon.pojo;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(onlyExplicitlyIncluded = true)
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer age;
+
+    private Gender gender;
 
     private String username;
 
