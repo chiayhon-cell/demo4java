@@ -16,7 +16,7 @@ public class DemoApplication {
     public static void main(String[] args) {
         final ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
         context.start();
-        eventPublisherTest(context);
+//        eventPublisherTest(context);
     }
 
     private static void eventPublisherTest(ConfigurableApplicationContext context) {
@@ -30,7 +30,5 @@ public class DemoApplication {
         log.info("注册结果:" + message);
     }
 
-//    private static void springAopTest(ConfigurableApplicationContext context) {
-//        final SpringAopTest testBean = context.getBean(SpringAopTest.class);
-//    }
+
 }
