@@ -6,18 +6,21 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 
 public class JedisDemo {
-    public static void main(String[] args) throws IOException {
-        new JedisDemo3().testHash();
+    public static void main(String[] args) {
+        JedisDemo1.main();
+        JedisDemo2.main();
+        JedisDemo3.testHash();
     }
 }
 
 @Slf4j
 class JedisDemo1 {
+    private JedisDemo1() {
+    }
 
     public static void main() {
         final Jedis client = init("redis", 6379, "1234321", 0);
@@ -46,6 +49,9 @@ class JedisDemo1 {
 
 @Slf4j
 class JedisDemo2 {
+    private JedisDemo2() {
+    }
+
     // 使用Jedis连接池代替直接创建Jedis
     static class JedisFactory {
         private static final JedisPool pool;
@@ -75,12 +81,14 @@ class JedisDemo2 {
 
 @Slf4j
 class JedisDemo3 {
+    private JedisDemo3() {
+    }
 
-    public void testHash() {
+    public static void testHash() {
         final Jedis client = JedisDemo2.JedisFactory.getClient();
         client.hset("user:1", "name", "jack");
         final Map<String, String> map = client.hgetAll("user:1");
-        System.out.println(map);
+        log.info("map -> {}", map);
         client.close();
     }
 }
