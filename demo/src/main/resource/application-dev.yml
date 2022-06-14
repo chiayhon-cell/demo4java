@@ -1,0 +1,24 @@
+server:
+  port: 8781
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: demo
+  datasource:
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/demo4java?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+  redis:
+    host: redis
+    port: 6379
+    password: 1234321
+    lettuce:
+      pool:
+        max-active: 8 #最大连接数
+        max-idle: 8   #最大空闲数
+        min-idle: 0   #最小空闲数
+        max-wait: 100 #连接空闲时间
+

@@ -4,7 +4,6 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>cn.chiayhon</groupId>
   <artifactId>base</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
@@ -56,7 +55,6 @@
   </dependencies>
 
   <build>
-  <!--  资源路径  -->
     <resources>
       <resource>
         <directory>src/main/java</directory>
@@ -66,6 +64,9 @@
       </resource>
       <resource>
         <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.*</include>
+        </includes>
       </resource>
     </resources>
   </build>
