@@ -1,6 +1,7 @@
 package cn.chiayhon.util.pdf;
 
 import net.qiyuesuo.common.pdf.utils.ImageScaleUtil;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -21,13 +22,13 @@ public class PdfBoxtoImg {
 		try {
 			long t1 = System.currentTimeMillis();
 			//通过 pdfbox 转换
-			pdDocument = PDDocument.load(pdfIn);
+			pdDocument = PDDocument.load(pdfIn, MemoryUsageSetting.setupTempFileOnly());
 //			showPdfAttribute(pdDocument);
 			pdDocument.setResourceCache(new QysResourceCache());
 			PDFRenderer renderer = new PDFRenderer(pdDocument);
+			renderer.setSubsamplingAllowed(true); //
 			long t2 = System.currentTimeMillis();
 			System.out.println("time:" + (t2 - t1));
-//			int pages = pdDocument.getNumberOfPages();
 			for (int page = 0; page < 1; page++) {
 				long t00 = System.currentTimeMillis();
 				PDPage pdPage = pdDocument.getPage(page);
@@ -35,8 +36,7 @@ public class PdfBoxtoImg {
 				float width = cropbBox.getWidth();
 				float height = cropbBox.getHeight();
 				float scale = ImageScaleUtil.scale(width, height);
-				BufferedImage bufferedImage = renderer.renderImage(page, 1.3F);
-//				BufferedImage bufferedImage = renderer.renderImageWithDPI(page,1.3F);
+				BufferedImage bufferedImage = renderer.renderImage(page, scale);
 				ImageIO.write(bufferedImage, "jpeg",
 						new File("C:\\Users\\chiayhon\\Desktop\\pdfbox_" + filePrifix + page + ".jpeg"));
 				long t01 = System.currentTimeMillis();
