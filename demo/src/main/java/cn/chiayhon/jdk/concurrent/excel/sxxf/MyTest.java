@@ -1,7 +1,7 @@
 package cn.chiayhon.jdk.concurrent.excel.sxxf;
 
 import cn.chiayhon.TaskHistory;
-import cn.chiayhon.excel.ExcelModel;
+import cn.chiayhon.excel.bean.ExcelModel;
 import cn.chiayhon.page.PageCondition;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package cn.chiayhon.excel;
+package cn.chiayhon.excel.bean;
 
 import java.util.ArrayList;
 import java.util.List;

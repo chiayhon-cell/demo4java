@@ -1,4 +1,4 @@
-package cn.chiayhon.excel;
+package cn.chiayhon.excel.bean;
 
 /**
  * 封装excel导出列信息

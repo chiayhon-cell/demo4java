@@ -3,8 +3,8 @@ package cn.chiayhon.util.poi.excel.sxxsf;
 import cn.chiayhon.TaskHistory;
 import cn.chiayhon.excel.BigDataExcelUtils;
 import cn.chiayhon.excel.ExcelBatchProcessor;
-import cn.chiayhon.excel.ExcelColumnModel;
-import cn.chiayhon.excel.ExcelModel;
+import cn.chiayhon.excel.bean.ExcelColumnModel;
+import cn.chiayhon.excel.bean.ExcelModel;
 import cn.chiayhon.page.PageCondition;
 import lombok.extern.slf4j.Slf4j;
 
