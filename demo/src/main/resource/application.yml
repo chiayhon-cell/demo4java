@@ -14,3 +14,7 @@ springdoc:
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+logging:
+  config: classpath:log4j2.xml # 日志配置文件位置

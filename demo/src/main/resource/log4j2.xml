@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appenders>
+        <!-- 控制台输出 -->
+        <console name="Console" target="SYSTEM_OUT">
+
+            <!--            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class %L %M - %msg%n"/>-->
+            <PatternLayout pattern="%date{HH:mm:ss.SSS} [%t] %-5level %c{1.}$%M %line - %m%n"/>
+        </console>
+        <!--
+
+                &lt;!&ndash; fileName：输出路径  filePattern：命名规则 &ndash;&gt;
+                <RollingFile name="AllFile" fileName="logs/All.log"
+                             filePattern="logs/$${date:yyyy-MM-dd}/allOut-%d{yyyy-MM-dd}-%i.log">
+                    <Filters>
+                        <ThresholdFilter level="all" onMatch="ACCEPT" onMismatch="DENY"/>
+                    </Filters>
+                    &lt;!&ndash; 输出格式 &ndash;&gt;
+                    <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%n" charset="UTF-8"/>
+                    <Policies>
+                        &lt;!&ndash;  每天生成一个日志文件  &ndash;&gt;
+                        <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                        &lt;!&ndash; SizeBasedTriggeringPolicy单个文件的大小限制 &ndash;&gt;
+                        <SizeBasedTriggeringPolicy size="100 MB"/>
+                    </Policies>
+                    &lt;!&ndash; DefaultRolloverStrategy同一个文件下的最大文件数 &ndash;&gt;
+                    <DefaultRolloverStrategy max="50"/>
+                </RollingFile>
+
+
+                <RollingFile name="ErrorFile" fileName="logs/Error.log"
+                             filePattern="logs/$${date:yyyy-MM-dd}/err-%d{yyyy-MM-dd}-%i.log">
+                    <Filters>
+                        <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+                    </Filters>
+                    &lt;!&ndash; 输出格式 &ndash;&gt;
+                    <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n" charset="UTF-8"/>
+                    <Policies>
+                        &lt;!&ndash;  每天生成一个日志文件  &ndash;&gt;
+                        <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                        &lt;!&ndash; SizeBasedTriggeringPolicy单个文件的大小限制 &ndash;&gt;
+                        <SizeBasedTriggeringPolicy size="100MB"/>
+                    </Policies>
+                    &lt;!&ndash; DefaultRolloverStrategy同一个文件下的最大文件数 &ndash;&gt;
+                    <DefaultRolloverStrategy max="50"/>
+                </RollingFile>
+
+        -->
+    </appenders>
+
+    <loggers>
+        <!--过滤掉spring无用的debug信息-->
+        <logger name="org.springframework" level="error"></logger>
+        <!--        <logger name="com.zhangxiaosan.top" level="debug"></logger>-->
+
+        <root level="info">
+            <appender-ref ref="Console"/>
+            <!--            <appender-ref ref="AllFile"/>-->
+            <!--            <appender-ref ref="ErrorFile"/>-->
+        </root>
+    </loggers>
+
+</configuration>

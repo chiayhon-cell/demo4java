@@ -1,6 +1,5 @@
 package cn.chiayhon.util.pdf;
 
-import net.qiyuesuo.common.pdf.utils.ImageScaleUtil;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -35,8 +34,8 @@ public class PdfBoxtoImg {
 				PDRectangle cropbBox = pdPage.getCropBox();
 				float width = cropbBox.getWidth();
 				float height = cropbBox.getHeight();
-				float scale = ImageScaleUtil.scale(width, height);
-				BufferedImage bufferedImage = renderer.renderImage(page, scale);
+//				float scale = ImageScaleUtil.scale(width, height);
+				BufferedImage bufferedImage = renderer.renderImage(page, 1);
 				ImageIO.write(bufferedImage, "jpeg",
 						new File("C:\\Users\\chiayhon\\Desktop\\pdfbox_" + filePrifix + page + ".jpeg"));
 				long t01 = System.currentTimeMillis();
