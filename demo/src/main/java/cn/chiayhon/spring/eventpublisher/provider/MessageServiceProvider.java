@@ -1,4 +1,4 @@
-package cn.chiayhon.spring.eventpublisher;
+package cn.chiayhon.spring.eventpublisher.provider;
 
 import cn.chiayhon.spring.eventpublisher.dto.MessageData;
 import cn.chiayhon.spring.eventpublisher.dto.MessageType;
