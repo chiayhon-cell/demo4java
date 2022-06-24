@@ -1,4 +1,4 @@
-package cn.chiayhon.rest.dao;
+package cn.chiayhon.rest.mapper;
 
 import cn.chiayhon.pojo.User;
 import org.apache.ibatis.annotations.Mapper;

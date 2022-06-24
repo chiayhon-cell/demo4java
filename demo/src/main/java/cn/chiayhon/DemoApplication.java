@@ -7,7 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
-@MapperScan(basePackages = "cn.chiayhon.mybatis")
+@MapperScan(basePackages = "cn.chiayhon.rest.mapper")
 @SpringBootApplication
 public class DemoApplication {
 
