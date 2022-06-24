@@ -5,7 +5,7 @@
         <console name="Console" target="SYSTEM_OUT">
 
             <!--            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class %L %M - %msg%n"/>-->
-            <PatternLayout pattern="%date{HH:mm:ss.SSS} [%t] %-5level %c{1.}$%M %line - %m%n"/>
+            <PatternLayout pattern="%date{HH:mm:ss.SSS} [%t] %-5level %30.30c{1.}$%M %line - %m%n"/>
         </console>
         <!--
 
