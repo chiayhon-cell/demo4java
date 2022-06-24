@@ -10,7 +10,7 @@ import java.sql.*;
 public class JDBCDemo {
 
     public static void main(String[] args) {
-        demo2();
+        demo4();
     }
 
     /**
@@ -91,6 +91,99 @@ public class JDBCDemo {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    log.error("fail closing statement");
+                }
+            }
+        }
+    }
+
+    /**
+     * the update usage demo of jdbc
+     */
+    public static void demo3() {
+        String url = "jdbc:mysql://localhost:3306/demo4java?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC";
+        String username = "root";
+        String password = "root";
+        PreparedStatement preparedStatement = null;
+        try (ConnectionManager manager = ConnectionManager.init(url, username, password)) {
+            Connection connection = manager.getConnection();
+            String sql = "UPDATE user u SET u.username = ? WHERE id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            // fill parameters
+            preparedStatement.setString(1, "张三");
+            preparedStatement.setLong(2, 1);
+            //
+            final int effectRowNum = preparedStatement.executeUpdate();
+            // get data
+            if (effectRowNum == 0) {
+                log.error("update fail, nothing changed");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    log.error("fail closing statement");
+                }
+            }
+        }
+    }
+
+    /**
+     * the transaction demo of jdbc
+     */
+    public static void demo4() {
+        String url = "jdbc:mysql://localhost:3306/demo4java?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC";
+        String username = "root";
+        String password = "root";
+        Connection connection = null;
+        try (ConnectionManager manager = ConnectionManager.init(url, username, password)) {
+            connection = manager.getConnection();
+            // disable automatic committing
+            connection.setAutoCommit(false);
+            // do update
+            update(connection);
+            throw new RuntimeException("runtime exception");
+        } catch (Exception e) {
+            // catch exception,the transaction should roll back
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                log.error("roll back failed");
+            }
+            log.error("update failed", e);
+        } finally {
+            try {
+                // commit transaction
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                log.error("commit failed", e);
+            }
+        }
+
+    }
+
+    private static void update(Connection connection) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            String sql = "UPDATE user u SET u.username = ? WHERE id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            // fill parameters
+            preparedStatement.setString(1, "张三1");
+            preparedStatement.setLong(2, 1);
+            //
+            final int effectRowNum = preparedStatement.executeUpdate();
+            // get data
+            if (effectRowNum == 0) {
+                log.error("update fail, nothing changed");
+            }
         } finally {
             if (preparedStatement != null) {
                 try {
