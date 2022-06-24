@@ -9,8 +9,8 @@ import java.sql.*;
 @Slf4j
 public class JDBCDemo {
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        demo1();
+    public static void main(String[] args) {
+        demo2();
     }
 
     /**
@@ -61,19 +61,44 @@ public class JDBCDemo {
                     connection.close();
                 }
             } catch (SQLException e) {
-                log.error("fail to close resource", e);
+                log.error("fail closing resource", e);
             }
         }
     }
 
     /**
-     * the elementary usage demo by {@link  cn.chiayhon.jdk.sql.jdbc.JDBCUtil} of jdbc
+     * the elementary usage demo by {@link  ConnectionManager} of jdbc
      */
     public static void demo2() {
-        String driver = "com.mysql.cj.jdbc.Driver";
         String url = "jdbc:mysql://localhost:3306/demo4java?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC";
         String username = "root";
         String password = "root";
-        JDBCUtil.init(driver, url, username, password);
+        PreparedStatement preparedStatement = null;
+        try (ConnectionManager manager = ConnectionManager.init(url, username, password)) {
+            Connection connection = manager.getConnection();
+            String sql = "SELECT * FROM user";
+            preparedStatement = connection.prepareStatement(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            // get data
+            while (resultSet.next()) {
+                final User user = new User();
+                user.setId(resultSet.getLong("id"));
+                user.setUsername(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
+                user.setAge(resultSet.getInt("age"));
+                user.setGender(Gender.valueOf(resultSet.getString("gender")));
+                log.info("the result of query：" + user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    log.error("fail closing statement");
+                }
+            }
+        }
     }
 }
