@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!-- 常量，类似与K - V 键值对，通过${xx}引用。日志存放路径 -->
+    <property name="log.path" value="logs/test"/>
+    <!-- 日志输出格式
+     d{HH:mm:ss.SSS}  日志输出的各式
+     [%thread]   执行日志的线程
+     %-5level    五个空格，可以自行调整为自己需要的格式
+     %logger{20} 输出的日志最大长度
+     [%method,%line] 调用日志的方法，以及行数
+     %msg%n" 日志内容，并且换行
+     -->
+    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n"/>
+
+    <!-- 日志输出的方式
+    ConsoleAppender 这个类是控制台输出，不打印到文件中
+     -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <!--日志输出的格式引用-->
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <!--在此，我们只输出info以及大于info级别以上的的日志-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <!-- 系统日志输出
+     RollingFileAppender    代表滚动日志，我们可以按天或者按月来生成不同的日志文件
+     -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--日志存放位置-->
+        <file>${log.path}/info.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式
+                %d{yyyy-MM-dd} 按天生成日志
+             -->
+            <fileNamePattern>${log.path}/info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <!--输出日志的格式-->
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <!--过滤器，表示只打印INFO级别的日志-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>INFO</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/error.log</file>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.path}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>ERROR</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- com.xxx 包下的日志打印则此记录器  -->
+    <logger name="com.xxx" level="info">
+        <appender-ref ref="file_info"/>
+        <appender-ref ref="file_error"/>
+    </logger>
+
+    <!--根日志记录器
+	不在com.xxx包下的日志则使用此记录器，比如系统级别的，只打印在控制台
+	-->
+    <root level="info">
+        <appender-ref ref="console"/>
+    </root>
+
+</configuration>
