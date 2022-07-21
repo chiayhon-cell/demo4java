@@ -1,6 +1,10 @@
 server:
   port: 8780
 
+spring:
+  profiles:
+    active: dev
+
 springdoc:
   swagger-ui:
     enabled: true #开启springdoc
@@ -8,7 +12,7 @@ springdoc:
 
 logging:
   config: classpath:logback-spring.xml # 日志配置文件位置
-spring:
-  config:
-    activate:
-      on-profile: dev
+
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

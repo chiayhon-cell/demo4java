@@ -10,7 +10,8 @@
      [%method,%line] 调用日志的方法，以及行数
      %msg%n" 日志内容，并且换行
      -->
-    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n"/>
+    <property name="log.pattern"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{40} - [%method,%line] - %msg%n"/>
 
     <!-- 日志输出的方式
     ConsoleAppender 这个类是控制台输出，不打印到文件中
