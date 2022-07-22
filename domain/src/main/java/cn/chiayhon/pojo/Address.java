@@ -1,9 +1,9 @@
-package cn.chiayhon.concurrent;
+package cn.chiayhon.pojo;
 
 import lombok.Data;
 
 @Data
-public class Department {
+public class Address {
     private Long id;
     private String name;
 }

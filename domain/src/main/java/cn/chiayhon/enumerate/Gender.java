@@ -1,4 +1,4 @@
-package cn.chiayhon.pojo;
+package cn.chiayhon.enumerate;
 
 import lombok.Getter;
 

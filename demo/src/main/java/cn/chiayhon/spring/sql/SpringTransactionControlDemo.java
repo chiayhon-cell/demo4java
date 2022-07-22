@@ -1,7 +1,7 @@
 package cn.chiayhon.spring.sql;
 
 
-import cn.chiayhon.pojo.Gender;
+import cn.chiayhon.enumerate.Gender;
 import cn.chiayhon.pojo.User;
 import cn.chiayhon.rest.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;

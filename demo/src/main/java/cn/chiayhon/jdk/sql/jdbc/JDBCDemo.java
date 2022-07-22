@@ -1,6 +1,6 @@
 package cn.chiayhon.jdk.sql.jdbc;
 
-import cn.chiayhon.pojo.Gender;
+import cn.chiayhon.enumerate.Gender;
 import cn.chiayhon.pojo.User;
 import lombok.extern.slf4j.Slf4j;
 

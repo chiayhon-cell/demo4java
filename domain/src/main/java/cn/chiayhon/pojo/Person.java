@@ -1,4 +1,4 @@
-package cn.chiayhon.concurrent;
+package cn.chiayhon.pojo;
 
 import lombok.Data;
 
