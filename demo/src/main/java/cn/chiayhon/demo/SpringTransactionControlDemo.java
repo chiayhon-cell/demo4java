@@ -1,4 +1,4 @@
-package cn.chiayhon.spring.sql;
+package cn.chiayhon.demo;
 
 
 import cn.chiayhon.enumerate.Gender;

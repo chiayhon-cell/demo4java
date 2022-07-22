@@ -1,8 +1,9 @@
 package cn.chiayhon.spring.base;
 
+import cn.chiayhon.demo.ApplicationEventDemo;
+import cn.chiayhon.demo.DatabaseInitDemo;
+import cn.chiayhon.demo.SpringTransactionControlDemo;
 import cn.chiayhon.pojo.User;
-import cn.chiayhon.spring.eventpublisher.ApplicationEvetDemo;
-import cn.chiayhon.spring.sql.SpringTransactionControlDemo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -17,9 +18,11 @@ import javax.annotation.Resource;
 @Slf4j
 public class ApplicationRunnerDemo implements ApplicationRunner {
     @Resource
-    private ApplicationEvetDemo applicationEvetDemo;
+    private ApplicationEventDemo applicationEventDemo;
     @Resource
     private SpringTransactionControlDemo springTransactionControlDemo;
+    @Resource
+    private DatabaseInitDemo databaseInitDemo;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -31,11 +34,21 @@ public class ApplicationRunnerDemo implements ApplicationRunner {
     private void init() {
         applicationEventDemoTest(false);
         springTransactionControlDemoTest(false);
+        databaseInitTest(true);
     }
 
 
+    public void databaseInitTest(boolean enable) {
+        if (enable) {
+            log.info("===== databaseInitTest start =====");
+            new Thread(() -> databaseInitDemo.main()).start();
+            log.info("===== databaseInitTest start =====");
+        }
+
+    }
+
     /**
-     * test for springTransactionControlDemo {@link cn.chiayhon.spring.sql.SpringTransactionControlDemo}
+     * test for springTransactionControlDemo {@link SpringTransactionControlDemo}
      */
     public void springTransactionControlDemoTest(boolean enable) {
         if (enable) {
@@ -54,7 +67,7 @@ public class ApplicationRunnerDemo implements ApplicationRunner {
             final User user = new User();
             user.setUsername("彭于晏");
             user.setPassword("1234");
-            final boolean success = applicationEvetDemo.register(user);
+            final boolean success = applicationEventDemo.register(user);
             String message = success ? "注册完成" : "用户已存在";
             log.info("注册结果:" + message);
             log.info("===== eventPublisherTest end =====");

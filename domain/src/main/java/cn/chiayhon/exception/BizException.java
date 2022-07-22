@@ -54,7 +54,7 @@ public class BizException extends RuntimeException {
 
 
     public BizException(String message, Throwable cause) {
-        this(null, null, message, cause);
+        this(null, message, null, cause);
     }
 
     public BizException(ErrorCodes codeType) {
