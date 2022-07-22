@@ -17,7 +17,7 @@ public class SQLImportDemo {
 
     private static final String url = "jdbc:mysql://127.0.0.1:3306/test-temp?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC";
     private static final String username = "root";
-    private static final String password = "chiayhon";
+    private static final String password = "root";
 
     public static void main(String[] args) {
         // 获取连接
@@ -33,10 +33,9 @@ public class SQLImportDemo {
     }
 
     public static void execute(Connection connection, String command) {
-        try {
-            final Statement statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
             statement.execute(command);
-        } catch (SQLException e) {
+        } catch (SQLException throwable) {
             throw new RuntimeException("执行sql失败");
         }
     }
