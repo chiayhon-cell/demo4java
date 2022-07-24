@@ -1,16 +1,12 @@
 package cn.chiayhon.collection;
 
+import cn.chiayhon.DemoTestSupport;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@SpringBootTest
-@RunWith(SpringRunner.class)
-public class CollectionAPIDemoTest {
+public class CollectionAPIDemoTest extends DemoTestSupport {
 
     @Test
-    public void s() {
+    void contextLoads() throws Exception {
         System.out.println(1);
     }
 }

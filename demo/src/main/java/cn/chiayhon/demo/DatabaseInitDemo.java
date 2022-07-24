@@ -28,12 +28,12 @@ public class DatabaseInitDemo {
 
     public void main() {
         DatabaseProperties databaseProperties = new DatabaseProperties(
-                DatabaseType.MYSQL,
-                "test-demo",
-                "localhost",
-                3306,
-                "root",
-                "root"
+                DatabaseType.MYSQL, // 数据库类型
+                "test-demo", // 数据库名
+                "localhost", //数据库地址
+                3306, // 数据库端口
+                "root", //数据库账号
+                "chiayhon" // 数据库密码
         );
         final InputStream inputStream = DatabaseInitDemo.class.getClassLoader().getResourceAsStream("temp/test.sql");
         final boolean success = databaseManageService.initDatabase(databaseProperties, inputStream);

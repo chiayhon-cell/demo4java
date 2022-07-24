@@ -34,7 +34,7 @@ public class ApplicationRunnerDemo implements ApplicationRunner {
     private void init() {
         applicationEventDemoTest(false);
         springTransactionControlDemoTest(false);
-        databaseInitTest(true);
+        databaseInitTest(false);
     }
 
 
