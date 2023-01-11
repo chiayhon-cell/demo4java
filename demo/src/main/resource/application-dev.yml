@@ -8,7 +8,7 @@ spring:
     name: demo
   datasource:
     username: root
-    password: chiayhon
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/demo4java?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
   redis:
