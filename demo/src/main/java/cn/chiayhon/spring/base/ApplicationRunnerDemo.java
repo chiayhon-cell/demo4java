@@ -7,14 +7,13 @@ import cn.chiayhon.pojo.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
 /**
  * Initialization for system
  */
-@Component
+//@Component
 @Slf4j
 public class ApplicationRunnerDemo implements ApplicationRunner {
     @Resource
