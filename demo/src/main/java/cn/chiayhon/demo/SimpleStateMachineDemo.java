@@ -32,6 +32,8 @@ public class SimpleStateMachineDemo implements ApplicationRunner {
         log.info("current state : {}", state1);
     }
 
+
+
     @EventListener(ApplicationReadyEvent.class)
     public void start2() {
         log.info("current state : {}", stateMachine.getState());

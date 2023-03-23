@@ -1,15 +1,19 @@
 package cn.chiayhon.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachine;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
+import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * simple state machine example
@@ -18,6 +22,16 @@ import java.util.HashSet;
 @EnableStateMachine
 public class SimpleStateMachineConfiguration
         extends StateMachineConfigurerAdapter<String, String> {
+    @Autowired
+    private List<StateMachineListenerAdapter<String,String>> stateMachineListeners;
+
+    @Override
+    public void configure(StateMachineConfigurationConfigurer<String, String> config) throws Exception {
+        super.configure(config);
+        for (StateMachineListenerAdapter<String, String> machineListener : stateMachineListeners) {
+            config.withConfiguration().listener(machineListener);
+        }
+    }
 
     @Override
     public void configure(StateMachineStateConfigurer<String, String> states) throws Exception {
@@ -49,13 +63,15 @@ public class SimpleStateMachineConfiguration
                 .source("S3").target("END").event("E1").action(transitionAction());
     }
 
+
+
     /**
      * init a action for transition
      * @return
      */
     @Bean
     public Action<String,String> transitionAction(){
-        return context -> System.out.println("state[" + context.getSource().getId() + "] transit to state[" + context.getTarget().getId() + "]");
+        return context -> System.out.println("========== state[" + context.getSource().getId() + "] transit to state[" + context.getTarget().getId() + "] ==========");
     }
 
     /**
