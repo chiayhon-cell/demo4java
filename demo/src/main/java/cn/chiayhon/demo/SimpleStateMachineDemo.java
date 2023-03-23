@@ -23,13 +23,26 @@ public class SimpleStateMachineDemo implements ApplicationRunner {
         stateMachine.start();
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void start(){
+    //    @EventListener(ApplicationReadyEvent.class)
+    public void start1() {
         State<String, String> state = stateMachine.getState();
-        log.info("current state : {}" ,state);
+        log.info("current state : {}", state);
         stateMachine.sendEvent("E1");
         State<String, String> state1 = stateMachine.getState();
-        log.info("current state : {}" ,state1);
+        log.info("current state : {}", state1);
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void start2() {
+        log.info("current state : {}", stateMachine.getState());
+        stateMachine.sendEvent("E1");
+        log.info("current state : {}", stateMachine.getState());
+        stateMachine.sendEvent("E1");
+        log.info("current state : {}", stateMachine.getState());
+        stateMachine.sendEvent("E1");
+        log.info("current state : {}", stateMachine.getState());
+        stateMachine.sendEvent("E1");
+        log.info("current state : {}", stateMachine.getState());
     }
 
 
