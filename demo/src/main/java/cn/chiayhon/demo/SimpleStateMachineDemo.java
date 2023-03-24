@@ -6,6 +6,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.state.State;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,10 @@ public class SimpleStateMachineDemo implements ApplicationRunner {
         log.info("current state : {}", stateMachine.getState());
         stateMachine.sendEvent("E1");
         log.info("current state : {}", stateMachine.getState());
+
+        ExtendedState extendedState = stateMachine.getExtendedState();
+        Integer count = extendedState.get("approvalCount",Integer.class);
+        log.info("approvalCount = {}", count);
     }
 
 

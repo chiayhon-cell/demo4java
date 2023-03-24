@@ -42,8 +42,12 @@ public class SimpleStateMachineConfiguration
 
                 // add entry/exit action as well as add corresponding error action
                 .stateEntry("S3",entryAction(),errorAction())
-                .state("S3")
-                .stateExit("S3",exitAction(),errorAction());
+                .state("S3",executeAction())
+                .stateExit("S3", exitAction(), errorAction())
+
+                // extended state
+                .state("S4",executeAction());
+
     }
 
     /**
@@ -60,7 +64,9 @@ public class SimpleStateMachineConfiguration
                 .withExternal()
                 .source("S2").target("S3").event("E1").action(transitionAction()).and()
                 .withExternal()
-                .source("S3").target("END").event("E1").action(transitionAction());
+                .source("S3").target("S4").event("E1").action(transitionAction()).and()
+                .withExternal()
+                .source("S4").target("END").event("E1").action(transitionAction());
     }
 
 
@@ -104,10 +110,28 @@ public class SimpleStateMachineConfiguration
 
     /**
      * error action for state
+     *
      * @return
      */
     @Bean
-    public Action<String,String> errorAction(){
-        return context -> System.out.println("error when executing .source state = [" + context.getSource().getId() + "]" +" . target state = [" + context.getTarget().getId() + "]");
+    public Action<String, String> errorAction() {
+        return context -> System.out.println("error when executing .source state = [" + context.getSource().getId() + "]" + " . target state = [" + context.getTarget().getId() + "]");
+    }
+
+    /**
+     * counter of the field approve
+     *
+     * @return
+     */
+    @Bean
+    public Action<String, String> executeAction() {
+        return context -> {
+            System.out.println("execute counting .source state = [" + context.getSource().getId() + "]" + " . target state = [" + context.getTarget().getId() + "]");
+            int approvals = (int) context.getExtendedState().getVariables()
+                    .getOrDefault("approvalCount", 0);
+            approvals++;
+            context.getExtendedState().getVariables()
+                    .put("approvalCount", approvals);
+        };
     }
 }
