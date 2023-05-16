@@ -1,6 +1,6 @@
 package cn.chiayhon.util.database;
 
-import cn.chiayhon.enumerate.DatabaseType;
+import cn.chiayhon.enums.DatabaseType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

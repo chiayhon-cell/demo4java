@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static cn.chiayhon.enumerate.Gender.MAN;
-import static cn.chiayhon.enumerate.Gender.WOMAN;
+import static cn.chiayhon.enums.Gender.MAN;
+import static cn.chiayhon.enums.Gender.WOMAN;
 
 @Slf4j
 public class OptionalDemo {

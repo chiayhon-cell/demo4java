@@ -1,6 +1,6 @@
 package cn.chiayhon.rest.service;
 
-import cn.chiayhon.enumerate.DatabaseType;
+import cn.chiayhon.enums.DatabaseType;
 import cn.chiayhon.properties.DatabaseProperties;
 import cn.chiayhon.util.database.DatabaseInitProcessor;
 

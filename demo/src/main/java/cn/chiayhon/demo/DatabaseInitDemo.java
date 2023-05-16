@@ -1,6 +1,6 @@
 package cn.chiayhon.demo;
 
-import cn.chiayhon.enumerate.DatabaseType;
+import cn.chiayhon.enums.DatabaseType;
 import cn.chiayhon.exception.BizException;
 import cn.chiayhon.properties.DatabaseProperties;
 import cn.chiayhon.rest.service.DatabaseManageService;

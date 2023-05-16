@@ -1,6 +1,6 @@
 package cn.chiayhon.properties;
 
-import cn.chiayhon.enumerate.DatabaseType;
+import cn.chiayhon.enums.DatabaseType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.slf4j.helpers.MessageFormatter;

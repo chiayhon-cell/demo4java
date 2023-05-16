@@ -40,6 +40,11 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>net.qiyuesuo.sdk</groupId>
+            <artifactId>private-sdk</artifactId>
+            <version>4210-1.0.1.RELEASE</version>
+        </dependency>
         <!-- spring-statemachine-core -->
         <dependency>
             <groupId>org.springframework.statemachine</groupId>

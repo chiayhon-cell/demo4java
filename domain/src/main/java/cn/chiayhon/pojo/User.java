@@ -1,6 +1,6 @@
 package cn.chiayhon.pojo;
 
-import cn.chiayhon.enumerate.Gender;
+import cn.chiayhon.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

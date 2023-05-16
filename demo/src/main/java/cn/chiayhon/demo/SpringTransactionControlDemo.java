@@ -1,7 +1,7 @@
 package cn.chiayhon.demo;
 
 
-import cn.chiayhon.enumerate.Gender;
+import cn.chiayhon.enums.Gender;
 import cn.chiayhon.pojo.User;
 import cn.chiayhon.rest.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;

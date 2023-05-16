@@ -1,6 +1,6 @@
 package cn.chiayhon.util.database;
 
-import cn.chiayhon.enumerate.DatabaseType;
+import cn.chiayhon.enums.DatabaseType;
 
 import java.io.InputStream;
 import java.sql.Connection;

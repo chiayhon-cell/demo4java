@@ -1,5 +1,7 @@
 package cn.chiayhon.listeners;
 
+import cn.chiayhon.enums.EVENTS;
+import cn.chiayhon.enums.STATES;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
 import org.springframework.stereotype.Component;
@@ -7,15 +9,15 @@ import org.springframework.stereotype.Component;
 import java.util.Objects;
 
 @Component
-public class S1Listener extends StateMachineListenerAdapter<String, String> {
+public class S1Listener extends StateMachineListenerAdapter<STATES, EVENTS> {
 
     @Override
-    public void stateChanged(State<String, String> from, State<String, String> to) {
-        String source = from.getId();
-        if (!Objects.equals(source, "S1")){
+    public void stateChanged(State<STATES, EVENTS> from, State<STATES, EVENTS> to) {
+        STATES source = from.getId();
+        if (!Objects.equals(source, STATES.STATE1)){
             return;
         }
-        String target = to.getId();
+        STATES target = to.getId();
         System.out.println("listen: source = " + source + " target = " + target);
     }
 }

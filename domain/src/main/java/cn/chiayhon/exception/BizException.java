@@ -1,7 +1,7 @@
 package cn.chiayhon.exception;
 
 
-import cn.chiayhon.enumerate.ErrorCodes;
+import cn.chiayhon.enums.ErrorCodes;
 
 import java.util.Optional;
 

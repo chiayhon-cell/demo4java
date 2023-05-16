@@ -1,7 +1,9 @@
 package cn.chiayhon.config;
 
+import cn.chiayhon.enums.EVENTS;
+import cn.chiayhon.enums.STATES;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachine;
@@ -9,44 +11,53 @@ import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
+import org.springframework.statemachine.config.configurers.ConfigurationConfigurer;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import static cn.chiayhon.enums.EVENTS.EVENT1;
+import static cn.chiayhon.enums.STATES.*;
+
 /**
  * simple state machine example
  */
 @Configuration
 @EnableStateMachine
+@Slf4j
 public class SimpleStateMachineConfiguration
-        extends StateMachineConfigurerAdapter<String, String> {
+        extends StateMachineConfigurerAdapter<STATES, EVENTS> {
+
     @Autowired
-    private List<StateMachineListenerAdapter<String,String>> stateMachineListeners;
+    private List<StateMachineListenerAdapter<STATES,EVENTS>> stateMachineListeners;
 
     @Override
-    public void configure(StateMachineConfigurationConfigurer<String, String> config) throws Exception {
+    public void configure(StateMachineConfigurationConfigurer<STATES, EVENTS> config) throws Exception {
         super.configure(config);
-        for (StateMachineListenerAdapter<String, String> machineListener : stateMachineListeners) {
-            config.withConfiguration().listener(machineListener);
+        ConfigurationConfigurer<STATES, EVENTS> configurer = config.withConfiguration();
+        configurer.autoStartup(true); // auto start after application running
+        for (StateMachineListenerAdapter<STATES, EVENTS> machineListener : stateMachineListeners) {
+            configurer.listener(machineListener);
         }
+
     }
 
     @Override
-    public void configure(StateMachineStateConfigurer<String, String> states) throws Exception {
+    public void configure(StateMachineStateConfigurer<STATES, EVENTS> states) throws Exception {
         states.withStates()
-                .initial("INIT") // init state
-                .end("END") // end state
-                .states(new HashSet<>(Arrays.asList("S1","S2"))) // other state
+                .initial(INIT) // init state
+                .end(END) // end state
+                .states(new HashSet<>(Arrays.asList(STATE1, STATE2))) // other state
 
                 // add entry/exit action as well as add corresponding error action
-                .stateEntry("S3",entryAction(),errorAction())
-                .state("S3",executeAction())
-                .stateExit("S3", exitAction(), errorAction())
+                .stateEntry(STATE3, entryAction(), errorAction())
+                .state(STATE3, executeAction())
+                .stateExit(STATE3, exitAction(), errorAction())
 
                 // extended state
-                .state("S4",executeAction());
+                .state(STATE4, executeAction());
 
     }
 
@@ -56,17 +67,17 @@ public class SimpleStateMachineConfiguration
      * @throws Exception e
      */
     @Override
-    public void configure(StateMachineTransitionConfigurer<String, String> transitions) throws Exception {
+    public void configure(StateMachineTransitionConfigurer<STATES, EVENTS> transitions) throws Exception {
         transitions.withExternal()
-                .source("INIT").target("S1").event("E1").action(transitionAction()).and()
+                .source(INIT).target(STATE1).event(EVENT1).action(transitionAction()).and()
                 .withExternal()
-                .source("S1").target("S2").event("E1").action(transitionAction()).and()
+                .source(STATE1).target(STATE2).event(EVENT1).action(transitionAction()).and()
                 .withExternal()
-                .source("S2").target("S3").event("E1").action(transitionAction()).and()
+                .source(STATE2).target(STATE3).event(EVENT1).action(transitionAction()).and()
                 .withExternal()
-                .source("S3").target("S4").event("E1").action(transitionAction()).and()
+                .source(STATE3).target(STATE4).event(EVENT1).action(transitionAction()).and()
                 .withExternal()
-                .source("S4").target("END").event("E1").action(transitionAction());
+                .source(STATE4).target(STATE5).event(EVENT1).action(transitionAction()).and();
     }
 
 
@@ -75,8 +86,7 @@ public class SimpleStateMachineConfiguration
      * init a action for transition
      * @return
      */
-    @Bean
-    public Action<String,String> transitionAction(){
+    public Action<STATES, EVENTS> transitionAction(){
         return context -> System.out.println("========== state[" + context.getSource().getId() + "] transit to state[" + context.getTarget().getId() + "] ==========");
     }
 
@@ -84,11 +94,10 @@ public class SimpleStateMachineConfiguration
      * entry action for transition
      * @return
      */
-    @Bean
-    public Action<String,String> entryAction(){
+    public Action<STATES, EVENTS> entryAction(){
         return context -> {
             System.out.println("this is a action for entry .source state = [" + context.getSource().getId() + "]" +" . target state = [" + context.getTarget().getId() + "]");
-            if ((System.currentTimeMillis() & 1) == 1){
+            if ((System.currentTimeMillis() & 3) == 3){
                 throw new RuntimeException("unexpected exception");
             }
         };
@@ -98,11 +107,10 @@ public class SimpleStateMachineConfiguration
      * exit action for transition
      * @return
      */
-    @Bean
-    public Action<String,String> exitAction(){
+    public Action<STATES, EVENTS> exitAction(){
         return context -> {
             System.out.println("this is a action for exit .source state = [" + context.getSource().getId() + "]" +" . target state = [" + context.getTarget().getId() + "]");
-            if ((System.currentTimeMillis() & 1) == 1){
+            if ((System.currentTimeMillis() & 3) == 3){
                 throw new RuntimeException("unexpected exception");
             }
         };
@@ -113,8 +121,7 @@ public class SimpleStateMachineConfiguration
      *
      * @return
      */
-    @Bean
-    public Action<String, String> errorAction() {
+    public Action<STATES, EVENTS> errorAction() {
         return context -> System.out.println("error when executing .source state = [" + context.getSource().getId() + "]" + " . target state = [" + context.getTarget().getId() + "]");
     }
 
@@ -123,8 +130,7 @@ public class SimpleStateMachineConfiguration
      *
      * @return
      */
-    @Bean
-    public Action<String, String> executeAction() {
+    public Action<STATES, EVENTS> executeAction() {
         return context -> {
             System.out.println("execute counting .source state = [" + context.getSource().getId() + "]" + " . target state = [" + context.getTarget().getId() + "]");
             int approvals = (int) context.getExtendedState().getVariables()
