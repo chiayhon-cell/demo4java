@@ -6,7 +6,6 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.time.Duration;
 import java.util.Map;
 
 public class JedisDemo {
@@ -61,7 +60,6 @@ class JedisDemo2 {
             config.setMaxTotal(8); // 最大连接
             config.setMaxIdle(8); // 最大空闲连接
             config.setMinIdle(0); // 最小空闲连接
-            config.setMaxWait(Duration.ofMinutes(1));
             pool = new JedisPool(config, "redis", 6379, 1000, "1234321");
         }
 

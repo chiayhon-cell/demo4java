@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.0</version>
+        <version>2.6.15</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>cn.chiayhon</groupId>
@@ -40,11 +40,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>net.qiyuesuo.sdk</groupId>
-            <artifactId>private-sdk</artifactId>
-            <version>4210-1.0.1.RELEASE</version>
-        </dependency>
         <!-- spring-statemachine-core -->
         <dependency>
             <groupId>org.springframework.statemachine</groupId>

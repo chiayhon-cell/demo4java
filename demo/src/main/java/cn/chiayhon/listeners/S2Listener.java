@@ -2,7 +2,6 @@ package cn.chiayhon.listeners;
 
 import cn.chiayhon.enums.EVENTS;
 import cn.chiayhon.enums.STATES;
-import org.springframework.messaging.Message;
 import org.springframework.statemachine.listener.StateMachineListenerAdapter;
 import org.springframework.statemachine.state.State;
 import org.springframework.stereotype.Component;
@@ -14,6 +13,9 @@ public class S2Listener extends StateMachineListenerAdapter<STATES, EVENTS> {
 
     @Override
     public void stateChanged(State<STATES, EVENTS> from, State<STATES, EVENTS> to) {
+        if (from == null){
+            return;
+        }
         STATES source = from.getId();
         if (!Objects.equals(source, STATES.STATE2)){
             return;

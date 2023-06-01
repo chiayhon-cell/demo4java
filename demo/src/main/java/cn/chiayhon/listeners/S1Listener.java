@@ -13,6 +13,9 @@ public class S1Listener extends StateMachineListenerAdapter<STATES, EVENTS> {
 
     @Override
     public void stateChanged(State<STATES, EVENTS> from, State<STATES, EVENTS> to) {
+        if (from == null){
+            return;
+        }
         STATES source = from.getId();
         if (!Objects.equals(source, STATES.STATE1)){
             return;
